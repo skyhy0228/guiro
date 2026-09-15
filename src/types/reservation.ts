@@ -11,6 +11,7 @@ export interface Slot {
   date: EventDate;
   time: string;
   status: SlotStatus;
+  clientStatusLabel?: string;
   bookingId?: string | null;
   blockedReason?: string | null;
   updatedAt?: Timestamp;

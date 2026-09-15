@@ -6,9 +6,20 @@ import { watchSlots } from '../services/bookingService';
 export function useSlots() {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    return watchSlots(setSlots, setError);
+    return watchSlots(
+      (nextSlots) => {
+        setSlots(nextSlots);
+        setError('');
+        setLoading(false);
+      },
+      (message) => {
+        setError(message);
+        setLoading(false);
+      },
+    );
   }, []);
 
   const normalizedSlots = useMemo(() => {
@@ -16,10 +27,18 @@ export function useSlots() {
     return EVENT_DATES.flatMap((date) =>
       EVENT_TIMES.map((time) => {
         const id = slotId(date, time);
-        return slotMap.get(id) || ({ id, date, time, status: 'available' } as Slot);
+        return (
+          slotMap.get(id) || {
+            id,
+            date,
+            time,
+            status: 'blocked' as const,
+            clientStatusLabel: error ? '현황 확인 실패' : loading ? '현황 확인 중' : '예약 준비 중',
+          }
+        );
       }),
     );
-  }, [slots]);
+  }, [error, loading, slots]);
 
   const slotsByDate = useMemo(() => {
     return EVENT_DATES.reduce<Record<EventDate, Slot[]>>(
@@ -31,5 +50,5 @@ export function useSlots() {
     );
   }, [normalizedSlots]);
 
-  return { slots: normalizedSlots, slotsByDate, error };
+  return { slots: normalizedSlots, slotsByDate, error, loading };
 }

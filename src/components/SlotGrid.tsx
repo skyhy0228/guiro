@@ -27,7 +27,7 @@ export function SlotGrid({ date, slots, selectedTime, onSelect }: SlotGridProps)
               aria-pressed={selected}
             >
               <strong>{slot.time}</strong>
-              <span>{slotStatusLabel(slot.status)}</span>
+              <span>{slot.clientStatusLabel || slotStatusLabel(slot.status)}</span>
             </button>
           );
         })}
