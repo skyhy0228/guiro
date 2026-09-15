@@ -1,0 +1,78 @@
+import { Link, Navigate, useLocation } from 'react-router-dom';
+import { ACCOUNT, EVENT_NAME, formatKoreanDate } from '../config/event';
+import type { BookingReceipt } from '../types/reservation';
+import { bookingStatusLabel, formatCurrency, paymentStatusLabel } from '../utils/format';
+
+export function CompletePage() {
+  const location = useLocation();
+  const receipt = location.state as BookingReceipt | null;
+
+  if (!receipt?.booking) return <Navigate to="/" replace />;
+
+  const { booking, managementCode } = receipt;
+
+  return (
+    <main className="single-column">
+      <section className="receipt-card">
+        <p className="eyebrow">예약 신청이 정상적으로 접수되었습니다.</p>
+        <h1>예약 신청이 완료되었습니다.</h1>
+        <p className="notice-strong">예약번호와 예약 관리 코드를 캡처하여 보관해주세요.</p>
+        <dl className="receipt-list">
+          <div>
+            <dt>예약번호</dt>
+            <dd>{booking.bookingCode}</dd>
+          </div>
+          <div>
+            <dt>예약 관리 코드</dt>
+            <dd>{managementCode}</dd>
+          </div>
+          <div>
+            <dt>행사</dt>
+            <dd>{EVENT_NAME}</dd>
+          </div>
+          <div>
+            <dt>예약일</dt>
+            <dd>{formatKoreanDate(booking.date)}</dd>
+          </div>
+          <div>
+            <dt>시간</dt>
+            <dd>{booking.time}</dd>
+          </div>
+          <div>
+            <dt>대표자명</dt>
+            <dd>{booking.representativeName}</dd>
+          </div>
+          <div>
+            <dt>인원</dt>
+            <dd>{booking.teamSize}명</dd>
+          </div>
+          <div>
+            <dt>예약금</dt>
+            <dd>{formatCurrency(booking.expectedDeposit)}</dd>
+          </div>
+          <div>
+            <dt>입금계좌</dt>
+            <dd>
+              {ACCOUNT.bank} {ACCOUNT.number}
+              <br />
+              {ACCOUNT.holder}
+            </dd>
+          </div>
+          <div>
+            <dt>예약 상태</dt>
+            <dd>
+              {bookingStatusLabel(booking.bookingStatus)} · {paymentStatusLabel(booking.paymentStatus)}
+            </dd>
+          </div>
+        </dl>
+        <div className="receipt-warning">
+          <strong>아직 입금 확인 전입니다.</strong>
+          <p>아래 계좌로 예약금을 입금해야 최종 예약이 완료됩니다. 입금 여부는 운영진이 수동으로 확인합니다.</p>
+        </div>
+        <Link className="primary-button" to="/lookup">
+          내 예약 조회 / 변경 / 취소
+        </Link>
+      </section>
+    </main>
+  );
+}
