@@ -13,6 +13,7 @@ import {
   isCurrentUserAdmin,
   loginAdmin,
   logoutAdmin,
+  requestAdminPasswordReset,
   setReservationStatus,
   setSlotBlocked,
   undoPaymentConfirmation,
@@ -47,12 +48,30 @@ export function AdminPage() {
   const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
 
   useEffect(() => {
+    let active = true;
+
     if (!ready || !user) {
       setIsAdmin(false);
-      return;
+      return () => {
+        active = false;
+      };
     }
-    void isCurrentUserAdmin().then(setIsAdmin);
-  }, [ready, user]);
+
+    void isCurrentUserAdmin(user)
+      .then((result) => {
+        if (active) setIsAdmin(result);
+      })
+      .catch((error) => {
+        if (active) {
+          setIsAdmin(false);
+          setMessage((error as Error).message);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [ready, user?.uid]);
 
   useEffect(() => {
     if (!isAdmin) return undefined;
@@ -109,7 +128,20 @@ export function AdminPage() {
     setMessage('');
     try {
       await loginAdmin(email, password);
-      setIsAdmin(await isCurrentUserAdmin());
+      setIsAdmin(true);
+    } catch (error) {
+      setMessage((error as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function resetPassword() {
+    setBusy(true);
+    setMessage('');
+    try {
+      await requestAdminPasswordReset(email);
+      setMessage('비밀번호 재설정 메일을 보냈습니다. 메일함과 스팸함을 확인해주세요.');
     } catch (error) {
       setMessage((error as Error).message);
     } finally {
@@ -143,20 +175,33 @@ export function AdminPage() {
         <section className="lookup-panel">
           <p className="eyebrow">관리자 로그인</p>
           <h1>Firebase 관리자 계정으로 로그인해주세요.</h1>
-          <div className="form-grid">
+          <form
+            className="admin-login-form"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void login();
+            }}
+          >
+            <div className="form-grid">
             <label>
               이메일
-              <input value={email} onChange={(event) => setEmail(event.target.value)} type="email" autoComplete="email" />
+              <input value={email} onChange={(event) => setEmail(event.target.value)} type="email" autoComplete="username" required />
             </label>
             <label>
               비밀번호
-              <input value={password} onChange={(event) => setPassword(event.target.value)} type="password" autoComplete="current-password" />
+              <input value={password} onChange={(event) => setPassword(event.target.value)} type="password" autoComplete="current-password" required />
             </label>
-          </div>
-          <button className="primary-button" type="button" onClick={() => void login()} disabled={busy || !ready}>
-            {busy ? '로그인 중...' : '로그인'}
-          </button>
-          {message && <p className="error-text">{message}</p>}
+            </div>
+            <div className="admin-login-actions">
+              <button className="primary-button" type="submit" disabled={busy || !ready}>
+                {busy ? '처리 중...' : '로그인'}
+              </button>
+              <button className="secondary-button" type="button" onClick={() => void resetPassword()} disabled={busy || !ready || !email.trim()}>
+                비밀번호 재설정 메일
+              </button>
+            </div>
+          </form>
+          {message && <p className={message.includes('보냈습니다') ? 'success-text' : 'error-text'}>{message}</p>}
         </section>
       </main>
     );
@@ -189,9 +234,9 @@ export function AdminPage() {
       {message && <p className={message.includes('완료') ? 'success-text' : 'error-text'}>{message}</p>}
 
       <section className="stats-grid" aria-label="예약 현황 요약">
-        <Stat label="전체 예약" value={`${stats.totalReserved} / 32`} />
-        <Stat label="9월 29일" value={`${stats.day29} / 16`} />
-        <Stat label="9월 30일" value={`${stats.day30} / 16`} />
+        <Stat label="전체 예약" value={`${stats.totalReserved} / ${slots.length}`} />
+        <Stat label="9월 29일" value={`${stats.day29} / ${slots.filter((slot) => slot.date === '2026-09-29').length}`} />
+        <Stat label="9월 30일" value={`${stats.day30} / ${slots.filter((slot) => slot.date === '2026-09-30').length}`} />
         <Stat label="총 예약 인원" value={`${stats.people}명`} />
         <Stat label="예상 예약금 합계" value={formatCurrency(stats.expectedDeposit)} />
         <Stat label="입금 확인 완료 금액" value={formatCurrency(stats.confirmedDeposit)} />

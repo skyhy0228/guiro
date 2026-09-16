@@ -11,7 +11,6 @@ export const EVENT_TIMES = [
   '14:00',
   '14:15',
   '14:30',
-  '14:45',
   '15:00',
   '15:15',
   '15:30',
@@ -21,6 +20,8 @@ export const EVENT_TIMES = [
   '16:30',
   '16:45',
 ] as const;
+
+export const BREAK_TIMES = ['14:45'] as const;
 
 export const MIN_TEAM_SIZE = 2;
 export const MAX_TEAM_SIZE = 6;

@@ -68,16 +68,25 @@ export function ReservationPage() {
   }
 
   return (
-    <main className="main-grid">
-      <section className="event-panel">
-        <p className="organizers">{ORGANIZERS}</p>
-        <h1>{EVENT_NAME}</h1>
-        <p className="event-meta">2026.09.29 - 09.30 · 13:00 - 17:00 · 15분 간격 예약제</p>
-        <p className="event-meta">팀당 2~6명</p>
-        <AccountBox teamSize={form.teamSize} expectedDeposit={expectedDeposit} />
+    <main className="reservation-page">
+      <section className="hero-banner" aria-labelledby="hero-title">
+        <div className="hero-banner-content">
+          <p>{ORGANIZERS}</p>
+          <h1 id="hero-title">{EVENT_NAME}</h1>
+          <span>2026.09.29 - 09.30 · 13:00 - 17:00</span>
+        </div>
       </section>
 
-      <section className="reservation-flow" aria-label="예약 신청">
+      <div className="main-grid">
+        <section className="event-panel">
+          <p className="organizers">{ORGANIZERS}</p>
+          <h1>{EVENT_NAME}</h1>
+          <p className="event-meta">2026.09.29 - 09.30 · 13:00 - 17:00 · 15분 간격 예약제</p>
+          <p className="event-meta">팀당 2~6명 · 14:45 브레이크타임</p>
+          <AccountBox teamSize={form.teamSize} expectedDeposit={expectedDeposit} />
+        </section>
+
+        <section className="reservation-flow" aria-label="예약 신청">
         {settings.status === 'CLOSED' && (
           <div className="alert-banner">
             <AlertTriangle size={18} aria-hidden="true" />
@@ -192,7 +201,8 @@ export function ReservationPage() {
             {submitting ? '예약 처리 중...' : '예약 신청'}
           </button>
         </section>
-      </section>
+        </section>
+      </div>
 
       {confirming && (
         <div className="modal-backdrop" role="presentation">

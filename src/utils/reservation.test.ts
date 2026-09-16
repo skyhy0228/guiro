@@ -3,6 +3,7 @@ import { canCreateBooking, normalizeManagementCode } from './crypto';
 import { calculateDeposit, formatPhone, normalizePhone } from './format';
 import { isValidKoreanMobile, isValidTeamSize, validateBookingForm } from './validation';
 import type { BookingFormData } from '../types/reservation';
+import { EVENT_TIMES } from '../config/event';
 
 const validForm: BookingFormData = {
   date: '2026-09-29',
@@ -38,6 +39,12 @@ describe('reservation validation', () => {
   it('requires privacy consent and required fields', () => {
     expect(validateBookingForm(validForm)).toBeNull();
     expect(validateBookingForm({ ...validForm, privacyConsent: false })).toContain('개인정보');
+  });
+
+  it('excludes the 14:45 break time from reservations', () => {
+    expect(EVENT_TIMES).toHaveLength(15);
+    expect(EVENT_TIMES).not.toContain('14:45');
+    expect(validateBookingForm({ ...validForm, time: '14:45' })).toContain('예약 시간');
   });
 });
 

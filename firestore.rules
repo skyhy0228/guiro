@@ -17,7 +17,7 @@ service cloud.firestore {
     function validTime(time) {
       return time in [
         '13:00', '13:15', '13:30', '13:45',
-        '14:00', '14:15', '14:30', '14:45',
+        '14:00', '14:15', '14:30',
         '15:00', '15:15', '15:30', '15:45',
         '16:00', '16:15', '16:30', '16:45'
       ];
@@ -31,7 +31,6 @@ service cloud.firestore {
         || (time == '14:00' && slotId == date + '_14-00')
         || (time == '14:15' && slotId == date + '_14-15')
         || (time == '14:30' && slotId == date + '_14-30')
-        || (time == '14:45' && slotId == date + '_14-45')
         || (time == '15:00' && slotId == date + '_15-00')
         || (time == '15:15' && slotId == date + '_15-15')
         || (time == '15:30' && slotId == date + '_15-30')

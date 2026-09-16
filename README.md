@@ -4,7 +4,7 @@
 
 ## 주요 기능
 
-- 2026-09-29, 2026-09-30 각 16개 슬롯 실시간 표시
+- 2026-09-29, 2026-09-30 각 15개 예약 슬롯 실시간 표시 (14:45 브레이크타임 제외)
 - Firestore transaction 기반 예약 생성, 시간 변경, 취소
 - `representativeLocks/{phoneHash}` 기반 동일 전화번호 중복 예약 방지
 - 예약번호와 강력한 예약 관리 코드 기반 조회, 변경, 취소
@@ -81,7 +81,7 @@ firebase deploy --only firestore:rules,firestore:indexes
 
 `.firebaserc`의 `YOUR_FIREBASE_PROJECT_ID`도 실제 프로젝트 ID로 바꿀 수 있습니다.
 
-## 7. 예약 슬롯 32개 초기화
+## 7. 예약 슬롯 초기화
 
 개발자 PC에서 Google Application Default Credentials 또는 서비스 계정으로 Admin SDK 권한을 준비합니다.
 
@@ -91,7 +91,7 @@ set GOOGLE_APPLICATION_CREDENTIALS=C:\path\to\serviceAccountKey.json
 npm run init:slots
 ```
 
-이미 존재하는 슬롯은 건드리지 않고 없는 슬롯만 생성합니다. 생성되는 슬롯은 2026-09-29 16개, 2026-09-30 16개입니다.
+예약 가능 슬롯은 2026-09-29와 2026-09-30 각각 15개이며, 양일 14:45는 브레이크타임으로 차단합니다.
 
 ## 8. 로컬 실행
 
