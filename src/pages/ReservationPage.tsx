@@ -1,6 +1,7 @@
 import { AlertTriangle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import heroImage from '../assets/guiro-hero.webp';
 import { AccountBox } from '../components/AccountBox';
 import { SlotGrid } from '../components/SlotGrid';
 import { EVENT_DATES, EVENT_NAME, MAX_TEAM_SIZE, MIN_TEAM_SIZE, ORGANIZERS, PRIVACY_RETENTION_LABEL, formatKoreanDate } from '../config/event';
@@ -69,12 +70,8 @@ export function ReservationPage() {
 
   return (
     <main className="reservation-page">
-      <section className="hero-banner" aria-labelledby="hero-title">
-        <div className="hero-banner-content">
-          <p>{ORGANIZERS}</p>
-          <h1 id="hero-title">{EVENT_NAME}</h1>
-          <span>2026.09.29 - 09.30 · 13:00 - 17:00</span>
-        </div>
+      <section className="hero-banner" aria-label="귀로 행사 안내 이미지">
+        <img className="hero-banner-image" src={heroImage} alt="2026 스릴러파크 귀로 행사 포스터" />
       </section>
 
       <div className="main-grid">
@@ -83,7 +80,6 @@ export function ReservationPage() {
           <h1>{EVENT_NAME}</h1>
           <p className="event-meta">2026.09.29 - 09.30 · 13:00 - 17:00 · 15분 간격 예약제</p>
           <p className="event-meta">팀당 2~6명 · 14:45 브레이크타임</p>
-          <AccountBox teamSize={form.teamSize} expectedDeposit={expectedDeposit} />
         </section>
 
         <section className="reservation-flow" aria-label="예약 신청">
@@ -111,7 +107,13 @@ export function ReservationPage() {
           </div>
         </section>
 
-        <SlotGrid date={form.date} slots={selectedSlots} selectedTime={form.time} onSelect={(time) => update('time', time)} />
+        <SlotGrid
+          date={form.date}
+          slots={selectedSlots}
+          selectedTime={form.time}
+          heading="STEP 2 시간 선택"
+          onSelect={(time) => update('time', time)}
+        />
 
         <section className="flow-section">
           <h2>STEP 3 팀 인원 선택</h2>

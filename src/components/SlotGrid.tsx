@@ -6,13 +6,15 @@ interface SlotGridProps {
   date: EventDate;
   slots: Slot[];
   selectedTime: string;
+  heading?: string;
   onSelect: (time: string) => void;
 }
 
-export function SlotGrid({ date, slots, selectedTime, onSelect }: SlotGridProps) {
+export function SlotGrid({ date, slots, selectedTime, heading, onSelect }: SlotGridProps) {
   return (
     <section className="flow-section" aria-labelledby={`slot-${date}`}>
-      <h2 id={`slot-${date}`}>{formatKoreanDate(date)} 시간 선택</h2>
+      <h2 id={`slot-${date}`}>{heading || `${formatKoreanDate(date)} 시간 선택`}</h2>
+      {heading && <p className="slot-date">{formatKoreanDate(date)}</p>}
       <div className="slot-grid">
         {slots.map((slot) => {
           const disabled = slot.status !== 'available';
