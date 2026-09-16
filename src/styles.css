@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Black+And+White+Picture&family=Noto+Sans+KR:wght@400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800&display=swap');
 
 :root {
   color: #f4ece8;
@@ -7,7 +7,6 @@
   font-size: 16px;
   line-height: 1.55;
   --font-body: "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-  --font-display: "Black And White Picture", "Noto Sans KR", sans-serif;
   --line: #3a282b;
   --text: #f4ece8;
   --muted: #b9aba7;
@@ -21,13 +20,6 @@
 
 html, body, button, input, select, textarea {
   font-family: var(--font-body);
-}
-
-h1, h2, h3, .organizers, .eyebrow, .top-nav a,
-.segmented button, .team-picker button, .primary-button, .secondary-button,
-.danger-button, .icon-button, .slot-button strong, .slot-admin strong,
-.status-badge, .notice-strong {
-  font-family: var(--font-display);
 }
 
 body {
