@@ -9,22 +9,18 @@ export function CompletePage() {
 
   if (!receipt?.booking) return <Navigate to="/" replace />;
 
-  const { booking, managementCode } = receipt;
+  const { booking } = receipt;
 
   return (
     <main className="single-column">
       <section className="receipt-card">
         <p className="eyebrow">예약 신청이 정상적으로 접수되었습니다.</p>
         <h1>예약 신청이 완료되었습니다.</h1>
-        <p className="notice-strong">예약번호와 예약 관리 코드를 캡처하여 보관해주세요.</p>
+        <p className="notice-strong">예약번호를 캡처하여 안전하게 보관해주세요.</p>
         <dl className="receipt-list">
           <div>
             <dt>예약번호</dt>
             <dd>{booking.bookingCode}</dd>
-          </div>
-          <div>
-            <dt>예약 관리 코드</dt>
-            <dd>{managementCode}</dd>
           </div>
           <div>
             <dt>행사</dt>
@@ -65,6 +61,7 @@ export function CompletePage() {
             </dd>
           </div>
         </dl>
+        <p className="notice-text">예약번호만으로 예약을 조회·변경·취소할 수 있으니 다른 사람에게 공유하지 마세요.</p>
         <div className="receipt-warning">
           <strong>아직 입금 확인 전입니다.</strong>
           <p>아래 계좌로 예약금을 입금해야 최종 예약이 완료됩니다. 입금 여부는 운영진이 수동으로 확인합니다.</p>

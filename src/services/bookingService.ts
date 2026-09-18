@@ -14,8 +14,16 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase/app';
 import { ACCOUNT, slotId } from '../config/event';
-import type { Booking, BookingFormData, BookingReceipt, EventDate, ReservationSettings, Slot } from '../types/reservation';
-import { createAccessKey, createBookingCode, createManagementCode, normalizeManagementCode, sha256 } from '../utils/crypto';
+import type { Booking, BookingFormData, BookingLookup, BookingReceipt, EventDate, ReservationSettings, Slot } from '../types/reservation';
+import {
+  createAccessKey,
+  createBookingCode,
+  createManagementCode,
+  isValidBookingCode,
+  normalizeBookingCode,
+  normalizeManagementCode,
+  sha256,
+} from '../utils/crypto';
 import { calculateDeposit, formatPhone, normalizePhone } from '../utils/format';
 import { validateBookingForm } from '../utils/validation';
 import { ensureAnonymousUser } from './authService';
@@ -72,6 +80,7 @@ export async function createBooking(form: BookingFormData): Promise<BookingRecei
   const managementCodeHash = await sha256(normalizeManagementCode(managementCode));
   const selectedSlotId = slotId(form.date, form.time);
   const bookingRef = doc(db, 'bookings', accessKey);
+  const lookupRef = doc(db, 'bookingLookups', bookingCode);
   const slotRef = doc(db, 'slots', selectedSlotId);
   const lockRef = doc(db, 'representativeLocks', phoneHash);
   const expectedDeposit = calculateDeposit(form.teamSize);
@@ -102,7 +111,9 @@ export async function createBooking(form: BookingFormData): Promise<BookingRecei
   try {
     await runTransaction(db, async (transaction) => {
       const slotSnap = await transaction.get(slotRef);
+      const lookupSnap = await transaction.get(lookupRef);
       if (!slotSnap.exists()) throw new Error('예약 슬롯이 아직 초기화되지 않았습니다. 운영진에게 문의해주세요.');
+      if (lookupSnap.exists()) throw new Error('예약번호 생성 중 충돌이 발생했습니다. 다시 시도해주세요.');
       const slot = slotSnap.data() as Slot;
       if (slot.status !== 'available') throw new Error(slotTakenMessage);
 
@@ -110,6 +121,11 @@ export async function createBooking(form: BookingFormData): Promise<BookingRecei
         ...booking,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
+      });
+      transaction.set(lookupRef, {
+        accessKey,
+        ownerUid: user.uid,
+        createdAt: serverTimestamp(),
       });
       transaction.update(slotRef, {
         status: 'reserved',
@@ -131,17 +147,21 @@ export async function createBooking(form: BookingFormData): Promise<BookingRecei
     throw new Error(humanizeFirebaseError(error));
   }
 
-  return { booking, managementCode };
+  return { booking };
 }
 
-export async function getBookingByCode(bookingCode: string, managementCode: string) {
+export async function getBookingByCode(bookingCode: string) {
   await ensureAnonymousUser();
-  const accessKey = await createAccessKey(bookingCode, managementCode);
+  const normalizedCode = normalizeBookingCode(bookingCode);
+  if (!isValidBookingCode(normalizedCode)) throw new Error('예약번호가 올바르지 않습니다.');
+
+  const lookupSnap = await getDoc(doc(db, 'bookingLookups', normalizedCode));
+  if (!lookupSnap.exists()) throw new Error('예약번호가 올바르지 않습니다.');
+  const { accessKey } = lookupSnap.data() as BookingLookup;
   const bookingSnap = await getDoc(doc(db, 'bookings', accessKey));
-  if (!bookingSnap.exists()) throw new Error('예약번호 또는 예약 관리 코드가 올바르지 않습니다.');
+  if (!bookingSnap.exists()) throw new Error('예약 정보를 찾을 수 없습니다. 운영진에게 문의해주세요.');
   const booking = bookingSnap.data() as Booking;
-  const expectedHash = await sha256(normalizeManagementCode(managementCode));
-  if (booking.managementCodeHash !== expectedHash) throw new Error('예약번호 또는 예약 관리 코드가 올바르지 않습니다.');
+  if (booking.bookingCode !== normalizedCode) throw new Error('예약 정보를 확인할 수 없습니다. 운영진에게 문의해주세요.');
   return booking;
 }
 

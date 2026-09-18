@@ -220,6 +220,7 @@ input, select {
 }
 
 .notice-strong { margin: 0 0 0.9rem; color: #ffe2a1; font-weight: 800; }
+.notice-text { margin: 0.75rem 0; color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
 dl { margin: 0; }
 dl div, .receipt-list div {
   display: flex;

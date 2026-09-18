@@ -11,6 +11,14 @@ export function createBookingCode(date: string) {
   return `GUIRO-${month}${day}-${randomString(5)}`;
 }
 
+export function normalizeBookingCode(code: string) {
+  return code.trim().toUpperCase();
+}
+
+export function isValidBookingCode(code: string) {
+  return /^GUIRO-(0929|0930)-[A-Z2-9]{5}$/.test(normalizeBookingCode(code));
+}
+
 export function createManagementCode() {
   return `${randomString(4)}-${randomString(4)}-${randomString(4)}`;
 }

@@ -11,3 +11,5 @@
 9. 일반 사용자의 전체 `bookings` list/query 요청은 거부되어야 한다.
 10. `admins/{uid}` 문서가 있는 관리자만 전체 예약 목록을 볼 수 있어야 한다.
 11. 예약 현황 화면은 `slots`만 읽고 `bookings` collection을 내려받지 않아야 한다.
+12. 기존 형식의 5자리 예약번호만으로 예약 관리 코드 없이 조회되어야 한다.
+13. 일반 사용자의 정확한 `bookingLookups/{bookingCode}` 문서 조회는 허용되지만 전체 list/query 요청은 거부되어야 한다.

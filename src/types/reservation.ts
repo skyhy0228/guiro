@@ -44,7 +44,12 @@ export interface Booking {
 
 export interface BookingReceipt {
   booking: Booking;
-  managementCode: string;
+}
+
+export interface BookingLookup {
+  accessKey: string;
+  ownerUid: string;
+  createdAt?: Timestamp;
 }
 
 export interface ReservationSettings {

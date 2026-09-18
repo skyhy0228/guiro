@@ -7,7 +7,7 @@
 - 2026-09-29, 2026-09-30 각 15개 예약 슬롯 실시간 표시 (14:45 브레이크타임 제외)
 - Firestore transaction 기반 예약 생성, 시간 변경, 취소
 - `representativeLocks/{phoneHash}` 기반 동일 전화번호 중복 예약 방지
-- 예약번호와 강력한 예약 관리 코드 기반 조회, 변경, 취소
+- 예약번호 하나로 조회, 변경, 취소 (`bookingLookups`는 개별 문서 조회만 허용)
 - 개인정보를 포함하지 않는 `slots` 공개 조회 구조
 - 관리자 Email/Password 로그인, UID 기반 `admins/{uid}` 권한 확인
 - 관리자 대시보드, 예약 검색/필터/정렬, 입금 확인, 예약 수정/취소, 슬롯 차단, CSV 다운로드
@@ -151,7 +151,8 @@ App Check는 남용 완화 장치이며 Security Rules를 대체하지 않습니
 ## 14. 데이터 구조
 
 - `slots/{date_time}`: 공개 예약 현황. 개인정보 없음.
-- `bookings/{accessKey}`: 예약 상세. 예약번호와 관리 코드에서 계산되는 강한 접근 키를 문서 ID로 사용합니다.
+- `bookings/{accessKey}`: 예약 상세. 직접 목록 조회는 관리자만 허용합니다.
+- `bookingLookups/{bookingCode}`: 예약번호에서 예약 문서를 찾기 위한 연결 정보. 로그인한 사용자의 정확한 문서 조회만 허용하고 목록 조회는 차단합니다.
 - `representativeLocks/{phoneHash}`: 동일 전화번호 중복 예약 방지.
 - `admins/{uid}`: 관리자 권한 문서.
 - `settings/reservation`: 예약 접수 `OPEN` 또는 `CLOSED`.

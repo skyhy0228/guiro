@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canCreateBooking, normalizeManagementCode } from './crypto';
+import { canCreateBooking, isValidBookingCode, normalizeBookingCode, normalizeManagementCode } from './crypto';
 import { calculateDeposit, formatPhone, normalizePhone } from './format';
 import { isValidKoreanMobile, isValidTeamSize, validateBookingForm } from './validation';
 import type { BookingFormData } from '../types/reservation';
@@ -57,5 +57,12 @@ describe('concurrency guard decisions', () => {
 
   it('normalizes management code before deriving lookup access', () => {
     expect(normalizeManagementCode(' k7p9-m2rx-48qd ')).toBe('K7P9M2RX48QD');
+  });
+
+  it('normalizes and validates the existing booking number format', () => {
+    expect(normalizeBookingCode(' guiro-0929-a7k3q ')).toBe('GUIRO-0929-A7K3Q');
+    expect(isValidBookingCode('GUIRO-0929-A7K3Q')).toBe(true);
+    expect(isValidBookingCode('GUIRO-0930-A7K3Q9RX')).toBe(false);
+    expect(isValidBookingCode('GUIRO-1001-A7K3Q')).toBe(false);
   });
 });

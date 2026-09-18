@@ -12,7 +12,6 @@ import { isValidTeamSize } from '../utils/validation';
 export function LookupPage() {
   const { slotsByDate } = useSlots();
   const [bookingCode, setBookingCode] = useState('');
-  const [managementCode, setManagementCode] = useState('');
   const [booking, setBooking] = useState<Booking | null>(null);
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -25,7 +24,7 @@ export function LookupPage() {
     setBusy(true);
     setMessage('');
     try {
-      const found = await getBookingByCode(bookingCode, managementCode);
+      const found = await getBookingByCode(bookingCode);
       setBooking(found);
       setEditDate(found.date);
       setEditTime(found.time);
@@ -52,7 +51,7 @@ export function LookupPage() {
     setMessage('');
     try {
       await changeBooking(booking, editDate, editTime, editTeamSize);
-      const refreshed = await getBookingByCode(booking.bookingCode, managementCode);
+      const refreshed = await getBookingByCode(booking.bookingCode);
       setBooking(refreshed);
       setMessage('예약 변경이 완료되었습니다.');
     } catch (error) {
@@ -68,7 +67,7 @@ export function LookupPage() {
     setMessage('');
     try {
       await cancelBooking(booking);
-      const refreshed = await getBookingByCode(booking.bookingCode, managementCode);
+      const refreshed = await getBookingByCode(booking.bookingCode);
       setBooking(refreshed);
       setCancelOpen(false);
       setMessage('예약이 취소되었습니다.');
@@ -83,17 +82,14 @@ export function LookupPage() {
     <main className="single-column">
       <section className="lookup-panel">
         <p className="eyebrow">내 예약 조회 / 변경 / 취소</p>
-        <h1>예약번호와 예약 관리 코드를 입력해주세요.</h1>
+        <h1>예약번호를 입력해주세요.</h1>
         <div className="form-grid">
           <label>
             예약번호
             <input value={bookingCode} onChange={(event) => setBookingCode(event.target.value.toUpperCase())} placeholder="GUIRO-0929-A7K3Q" />
           </label>
-          <label>
-            예약 관리 코드
-            <input value={managementCode} onChange={(event) => setManagementCode(event.target.value.toUpperCase())} placeholder="K7P9-M2RX-48QD" />
-          </label>
         </div>
+        <p className="notice-text">예약번호만 있으면 예약을 조회·변경·취소할 수 있으니 다른 사람에게 공유하지 마세요.</p>
         <button className="primary-button" type="button" onClick={() => void lookup()} disabled={busy}>
           {busy ? '조회 중...' : '조회하기'}
         </button>
